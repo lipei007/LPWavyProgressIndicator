@@ -118,9 +118,13 @@ static const int dark_water_color = 0x3EA4C7;
 #pragma mark - Setter
 
 - (void)setProgress:(float)progress {
-    if (progress > 1.0f || progress < 0.0f) {
-        @throw NSRangeException;
+    if (progress < 0.0f) {
+        progress = fabsf(progress);
     }
+    if (progress > 1.0f) {
+        progress = 1.0f;
+    }
+    
     _progress = progress;
     NSString *progress_str = [NSString stringWithFormat:@"%.1f%%",progress * 100];
     self.textLayer.string = progress_str;
@@ -134,7 +138,7 @@ static const int dark_water_color = 0x3EA4C7;
         A = [self getDefaultA];
     }
     
-    [self setNeedsDisplay];
+    [self updateProgress];
 }
 
 #pragma mark - Lazy load
@@ -315,12 +319,12 @@ static const int dark_water_color = 0x3EA4C7;
 // 控制速度
 static float deta = 0;
 
-- (void)drawRect:(CGRect)rect {
-    // Drawing code
+- (void)updateProgress {
     
-    [self updateSinLayer1];
-    [self updateSinLayer2];
-    
+    [UIView animateWithDuration:0.3 animations:^{
+        [self updateSinLayer1];
+        [self updateSinLayer2];
+    }];
 }
 
 #pragma mark - Action
@@ -328,7 +332,7 @@ static float deta = 0;
 - (void)updateDisplay:(CADisplayLink *)displayLink {
     
     deta += w * (ratio * [self minSize]);
-    [self setNeedsDisplay];
+    [self updateProgress];
 }
 
 @end

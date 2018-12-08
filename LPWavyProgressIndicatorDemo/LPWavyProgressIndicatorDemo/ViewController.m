@@ -22,11 +22,29 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     
-    v = [[LPWavyProgressIndicator alloc] initWithFrame:CGRectMake(100, 100, 40, 40)];
+    v = [[LPWavyProgressIndicator alloc] initWithFrame:CGRectMake(100, 100, 100, 100)];
     [self.view addSubview:v];
     v.progress = 0.1;
+    
+    [self moockDownload];
 }
 
+- (void)moockDownload {
+    
+    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+       
+        sleep(1);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            v.progress += 0.01;
+            
+            if (v.progress < 1) {
+                [self moockDownload];
+            }
+        });
+        
+    });
+    
+}
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
